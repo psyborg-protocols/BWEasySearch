@@ -4,117 +4,107 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sales Quoting Tool</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Bootstrap CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- MSAL.js CDN -->
   <script src="https://alcdn.msauth.net/browser/2.32.0/js/msal-browser.min.js"></script>
   <!-- Fuse.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
 </head>
-<body class="bg-gray-50 text-gray-800">
-  <div class="container mx-auto p-4">
+<body class="bg-light">
+  <div class="container py-4">
     <!-- Header -->
-    <header class="flex flex-col md:flex-row items-center justify-between mb-6">
-      <h1 class="text-3xl font-bold mb-4 md:mb-0">Sales Quoting Tool</h1>
-      <div class="flex items-center space-x-4">
-        <button id="signInButton" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow">
-          Sign In
-        </button>
-        <div id="userInfo" class="text-lg"></div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3">Sales Quoting Tool</h1>
+      <div>
+        <button id="signInButton" class="btn btn-primary">Sign In</button>
+        <span id="userInfo" class="ms-3"></span>
       </div>
-    </header>
+    </div>
     
-    <!-- Main Content: Three Columns -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      
-      <!-- Customer Column -->
-      <div class="bg-white p-4 rounded shadow">
-        <h2 class="text-xl font-semibold mb-2">Customer</h2>
-        <input type="text" id="customerSearch" placeholder="Search Customer..."
-          class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <!-- Customer search dropdown -->
-        <div id="customerDropdown" class="mt-2">
-          <!-- Fuzzy search results go here -->
-        </div>
-        <!-- Order History Table -->
-        <div class="mt-4">
-          <h3 class="text-lg font-semibold mb-2">Order History</h3>
-          <div class="overflow-auto max-h-64">
-            <table class="min-w-full bg-white border border-gray-200">
+    <!-- Main Content: Combined Card -->
+    <div class="card bg-white p-4 rounded shadow">
+      <div class="row">
+        <!-- Customer Column -->
+        <div class="col-md-4 mb-4 mb-md-0">
+          <h4>Customer</h4>
+          <div class="mb-3">
+            <input type="text" id="customerSearch" class="form-control" placeholder="Search Customer...">
+          </div>
+          <div id="customerDropdown" class="mb-3">
+            <!-- Customer fuzzy search dropdown results go here -->
+          </div>
+          <h5>Order History</h5>
+          <div class="table-responsive" style="max-height: 300px;">
+            <table class="table table-bordered table-striped">
               <thead>
                 <tr>
-                  <th class="py-2 px-4 border-b">Date</th>
-                  <th class="py-2 px-4 border-b">Product</th>
-                  <th class="py-2 px-4 border-b">Quantity</th>
-                  <th class="py-2 px-4 border-b">Total</th>
+                  <th>Date</th>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Total</th>
                 </tr>
               </thead>
-              <tbody id="orderHistoryTable" class="text-sm">
+              <tbody id="orderHistoryTable">
                 <!-- Order history rows will be injected here -->
               </tbody>
             </table>
           </div>
         </div>
-      </div>
-      
-      <!-- Product Column -->
-      <div class="bg-white p-4 rounded shadow">
-        <h2 class="text-xl font-semibold mb-2">Product</h2>
-        <input type="text" id="productSearch" placeholder="Search Product..."
-          class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <!-- Matching Products Table -->
-        <div class="mt-4">
-          <h3 class="text-lg font-semibold mb-2">Matching Products</h3>
-          <div class="overflow-auto max-h-64">
-            <table class="min-w-full bg-white border border-gray-200">
+        
+        <!-- Product Column -->
+        <div class="col-md-4 mb-4 mb-md-0">
+          <h4>Product</h4>
+          <div class="mb-3">
+            <input type="text" id="productSearch" class="form-control" placeholder="Search Product...">
+          </div>
+          <h5>Matching Products</h5>
+          <div class="table-responsive" style="max-height: 300px;">
+            <table class="table table-bordered table-striped">
               <thead>
                 <tr>
-                  <th class="py-2 px-4 border-b">Product ID</th>
-                  <th class="py-2 px-4 border-b">Inventory</th>
-                  <th class="py-2 px-4 border-b">Cost</th>
+                  <th>Product ID</th>
+                  <th>Inventory</th>
+                  <th>Cost</th>
                 </tr>
               </thead>
-              <tbody id="productTable" class="text-sm">
+              <tbody id="productTable">
                 <!-- Matching products rows will be injected here -->
               </tbody>
             </table>
           </div>
         </div>
-      </div>
-      
-      <!-- Pricing Column -->
-      <div class="bg-white p-4 rounded shadow">
-        <h2 class="text-xl font-semibold mb-2">Pricing</h2>
-        <!-- B2B/B2C Toggle -->
-        <div class="flex items-center justify-center mb-4">
-          <span class="mr-2 font-medium">B2B</span>
-          <button id="toggleB2B" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded shadow">
-            Toggle
-          </button>
-          <span class="ml-2 font-medium">B2C</span>
-        </div>
-        <!-- Pricing Table -->
-        <div>
-          <h3 class="text-lg font-semibold mb-2">Prices</h3>
-          <div class="overflow-auto max-h-64">
-            <table class="min-w-full bg-white border border-gray-200">
+        
+        <!-- Pricing Column -->
+        <div class="col-md-4">
+          <h4>Pricing</h4>
+          <div class="d-flex align-items-center mb-3">
+            <span class="me-2">B2B</span>
+            <button id="toggleB2B" class="btn btn-secondary">Toggle</button>
+            <span class="ms-2">B2C</span>
+          </div>
+          <h5>Prices</h5>
+          <div class="table-responsive" style="max-height: 300px;">
+            <table class="table table-bordered table-striped">
               <thead>
                 <tr>
-                  <th class="py-2 px-4 border-b">Price</th>
+                  <th>Price</th>
                 </tr>
               </thead>
-              <tbody id="priceTable" class="text-sm">
+              <tbody id="priceTable">
                 <!-- Price rows will be injected here -->
               </tbody>
             </table>
           </div>
         </div>
+        
       </div>
-      
     </div>
   </div>
   
   <!-- Auth.js Script: Handles MSAL authentication -->
   <script src="src/auth.js"></script>  
+  <!-- Bootstrap JS Bundle CDN (includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
